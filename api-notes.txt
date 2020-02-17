@@ -1,0 +1,37 @@
+https://developer.github.com/v3/pulls/#list-pull-requests
+Accept: application/vnd.github.shadow-cat-preview+json
+GET /repos/:owner/:repo/pulls
+{
+state: 'open',
+sort: 'updated'
+}
+
+=>
+
+[
+  {
+    "url": "https://api.github.com/repos/octocat/Hello-World/pulls/1347",
+...
+    "review_comments_url": "https://api.github.com/repos/octocat/Hello-World/pulls/1347/comments",
+...
+    "comments_url": "https://api.github.com/repos/octocat/Hello-World/issues/1347/comments",
+...
+    "updated_at": "2011-01-26T19:01:12Z",
+...
+    "merge_commit_sha": "e5bd3914e2e596debea16f433f57875b5b90bcd6",
+...
+    "head": {
+...
+      "ref": "new-topic",
+      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+...
+    },
+    "base": {
+      "label": "octocat:master",
+      "ref": "master",
+      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+...
+    },
+  },
+...
+]
