@@ -1,2 +1,11 @@
 ^\.github/workflows/
 ^LICENSE\.html$
+^Dockerfile$
+^action\.yml$
+^docker-setup$
+^exclude$
+^reporter\.json$
+^reporter\.pl$
+^test-spelling-unknown-words$
+^w$
+^xargs_zero$
