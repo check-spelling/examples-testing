@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2.0.0
       with:
         path: .git/spell-check
-        ref: spelling-data-lorem
+        ref: spelling-data-local
     - uses: check-spelling/check-spelling@0.0.2-alpha
       env:
         bucket: .git
