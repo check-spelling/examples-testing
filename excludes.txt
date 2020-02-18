@@ -1,5 +1,6 @@
 ^\.github/workflows/
 ^LICENSE\.html$
+^debug\.sh$
 ^Dockerfile$
 ^action\.yml$
 ^docker-setup$
