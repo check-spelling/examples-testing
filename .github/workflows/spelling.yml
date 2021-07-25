@@ -1,21 +1,99 @@
 name: Spell checking
-on: [pull_request_target, push, issue_comment]
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+  pull_request_target:
+  issue_comment:
+    types: [created]
 
 jobs:
-  build:
+  spelling:
     name: Spell checking
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
+    if: "contains(github.event_name, 'pull_request') || github.event_name == 'push'"
     steps:
     - name: checkout-merge
       if: "contains(github.event_name, 'pull_request')"
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v2
       with:
         ref: refs/pull/${{github.event.pull_request.number}}/merge
     - name: checkout
-      if: "!contains(github.event_name, 'pull_request')"
-      uses: actions/checkout@v2.3.4
-
-    - uses: jsoref/check-spelling@prerelease
+      if: github.event_name == 'push'
+      uses: actions/checkout@v2
+    - name: check-spelling
+      id: spelling
+      uses: check-spelling/check-spelling@prerelease
       with:
         config: .github/actions/spell-check
         experimental_apply_changes_via_bot: 1
+        suppress_push_for_open_pull_request: 1
+        post_comment: 0
+    - name: store-comment
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: "check-spelling-comment-${{ github.run_id }}"
+        path: |
+          ${{ steps.spelling.outputs.skipped_files }}
+          ${{ steps.spelling.outputs.stale_words }}
+          ${{ steps.spelling.outputs.unknown_words }}
+          ${{ steps.spelling.outputs.suggested_dictionaries }}
+          ${{ steps.spelling.outputs.warnings }}
+
+  comment:
+    name: Comment
+    runs-on: ubuntu-latest
+    needs: spelling
+    permissions:
+      contents: write
+      pull-requests: write
+    if: always() && needs.spelling.result == 'failure'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: set up
+      run: |
+        mkdir /tmp/data
+    - name: retrieve-comment
+      uses: actions/download-artifact@v2
+      with:
+        name: "check-spelling-comment-${{ github.run_id }}"
+        path: /tmp/data
+    - name: comment
+      uses: check-spelling/check-spelling@prerelease
+      with:
+        config: .github/actions/spell-check
+        experimental_apply_changes_via_bot: 1
+        debug: 1
+      env:
+        CUSTOM_TASK: comment
+        NEW_TOKENS: /tmp/data/tokens.txt
+        STALE_TOKENS: /tmp/data/remove_words.txt
+        NEW_EXCLUDES: /tmp/data/should_exclude.txt
+        SUGGESTED_DICTIONARIES: /tmp/data/suggested_dictionaries.json
+
+  update:
+    name: Update PR
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    if: ${{
+        github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@check-spelling-bot apply')
+      }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: check-spelling
+      uses: check-spelling/check-spelling@prerelease
+      with:
+        config: .github/actions/spell-check
+        experimental_apply_changes_via_bot: 1
+        debug: 1
