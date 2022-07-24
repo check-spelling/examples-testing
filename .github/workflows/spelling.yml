@@ -55,7 +55,8 @@ jobs:
         spell_check_this: check-spelling/spell-check-this@prerelease
         post_comment: 0
         experimental_apply_changes_via_bot: 1
-        check_commit_messages: commit, commits, summary, description
+        check_commit_messages: commits, summary
+        check_file_names: 1
 
   comment:
     name: Report
