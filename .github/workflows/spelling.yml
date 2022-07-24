@@ -56,7 +56,6 @@ jobs:
         post_comment: 0
         experimental_apply_changes_via_bot: 1
         check_commit_messages: commit, commits, summary, description
-        debug: 1
 
   comment:
     name: Report
