@@ -37,6 +37,7 @@ jobs:
       contents: read
       pull-requests: read
       actions: read
+      security-events: write
     outputs:
       followup: ${{ steps.spelling.outputs.followup }}
     runs-on: ubuntu-latest
@@ -54,6 +55,7 @@ jobs:
         checkout: true
         spell_check_this: check-spelling/spell-check-this@prerelease
         post_comment: 0
+        use_sarif: 1
         experimental_apply_changes_via_bot: 1
         check_commit_messages: commits, summary
         check_file_names: 1
